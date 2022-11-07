@@ -29,8 +29,37 @@ async function dbConnect() {
 }
 dbConnect()
 
+// Database Collection
+const Services = client.db('onlineBasketDb').collection('services')
+
+// All Api Create Below
+
+// Service Create Api
+app.post('/api/online-basket/services', async (req, res) => {
+    try {
+        const services = await Services.insertOne(req.body)
+        if(services.insertedId) {
+            res.send({
+                success: true,
+                message: 'Service created successfully!'
+            })
+        }else{
+            res.send({
+                success: false,
+                error: "Couldn't create service!"
+            })
+        }
+    } catch (error) {
+        console.log(error.name, error.message)
+        res.send({
+            success: false,
+            error: error.message
+        }) 
+    }
+})
+
 
 
 app.listen(port, () => {
-    console.log(`Genius Car Server Running on Port ${port}`)
+    console.log(`Online Basket Server Running on Port ${port}`)
 })
