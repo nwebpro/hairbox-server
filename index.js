@@ -65,7 +65,7 @@ app.get('/api/online-basket/services', async (req, res) => {
         const services = await cursor.limit(3).toArray()
         res.send({
             success: true,
-            message: 'Successfully got the all services data',
+            message: 'Successfully got the latest 3 services data',
             data: services
         })
     } catch (error) {
