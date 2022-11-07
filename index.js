@@ -2,7 +2,7 @@ import express from 'express'
 import cors from 'cors'
 import * as dotenv from 'dotenv'
 dotenv.config()
-import { MongoClient, ServerApiVersion } from 'mongodb'
+import { MongoClient, ObjectId, ServerApiVersion } from 'mongodb'
 
 const app = express()
 const port = process.env.PORT || 5000
@@ -93,6 +93,26 @@ app.get('/api/online-basket/all-services', async (req, res) => {
             success: false,
             error: error.message
         })
+    }
+})
+
+// Single Service Get Api with Id
+app.get('/api/online-basket/service/:serviceDetailId', async (req, res) => {
+    try {
+        const serviceDetailId = req.params.serviceDetailId
+        const query = { _id: ObjectId(serviceDetailId) }
+        const services = await Services.findOne(query)
+        res.send({
+            success: true,
+            message: 'Successfully got the each service data with services id',
+            data: services
+        })
+    } catch (error) {
+        console.log(error.name, error.message)
+        res.send({
+            success: false,
+            error: error.message
+        })     
     }
 })
 
