@@ -58,7 +58,24 @@ app.post('/api/online-basket/services', async (req, res) => {
     }
 })
 
-
+// Home Page Service Get Api
+app.get('/api/online-basket/services', async (req, res) => {
+    try {
+        const cursor = Services.find({})
+        const services = await cursor.limit(3).toArray()
+        res.send({
+            success: true,
+            message: 'Successfully got the all services data',
+            data: services
+        })
+    } catch (error) {
+        console.log(error.name, error.message)
+        res.send({
+            success: false,
+            error: error.message
+        })
+    }
+})
 
 app.listen(port, () => {
     console.log(`Online Basket Server Running on Port ${port}`)
