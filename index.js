@@ -31,6 +31,7 @@ dbConnect()
 
 // Database Collection
 const Services = client.db('onlineBasketDb').collection('services')
+const Reviews = client.db('onlineBasketDb').collection('reviews')
 
 // All Api Create Below
 
@@ -97,10 +98,10 @@ app.get('/api/online-basket/all-services', async (req, res) => {
 })
 
 // Single Service Get Api with Id
-app.get('/api/online-basket/service/:serviceDetailId', async (req, res) => {
+app.get('/api/online-basket/service/:serviceId', async (req, res) => {
     try {
-        const serviceDetailId = req.params.serviceDetailId
-        const query = { _id: ObjectId(serviceDetailId) }
+        const serviceId = req.params.serviceId
+        const query = { _id: ObjectId(serviceId) }
         const services = await Services.findOne(query)
         res.send({
             success: true,
@@ -113,6 +114,145 @@ app.get('/api/online-basket/service/:serviceDetailId', async (req, res) => {
             success: false,
             error: error.message
         })     
+    }
+})
+
+// All Review Api Below
+app.post('/api/online-basket/reviews', async (req, res) => {
+    try {
+        const reviews = await Reviews.insertOne(req.body)
+        if(reviews.insertedId) {
+            res.send({
+                success: true,
+                message: 'Review created successfully!'
+            })
+        }else{
+            res.send({
+                success: false,
+                error: "Couldn't create review!"
+            })
+        }
+    } catch (error) {
+        console.log(error.name, error.message)
+        res.send({
+            success: false,
+            error: error.message
+        }) 
+    }
+})
+
+// Review Display with service id
+app.get('/api/online-basket/all-review', async (req, res) => {
+    try {
+        let query = {}
+        if(req.query.serviceId){
+            query = {
+                serviceId: req.query.serviceId
+            }
+        }
+        const cursor = Reviews.find(query)
+        const reviews = await cursor.toArray()
+        res.send({
+            success: true,
+            message: 'Successfully got the all reviews data',
+            data: reviews
+        })
+    } catch (error) {
+        console.log(error.name, error.message)
+        res.send({
+            success: false,
+            error: error.message
+        })
+    }
+})
+
+// Review Display with user email
+app.get('/api/online-basket/review', async (req, res) => {
+    try {
+        let query = {}
+        if(req.query.email){
+            query = {
+                userEmail: req.query.email
+            }
+        }
+        const cursor = Reviews.find(query)
+        const reviews = await cursor.toArray()
+        res.send({
+            success: true,
+            message: 'Successfully got the all reviews data',
+            data: reviews
+        })
+    } catch (error) {
+        console.log(error.name, error.message)
+        res.send({
+            success: false,
+            error: error.message
+        })
+    }
+})
+
+// Single Review with id
+app.get("/api/online-basket/review/:reviewId", async (req, res) => {
+    try {
+        const reviewId = req.params.reviewId
+        const reviews = await Reviews.findOne({ _id: ObjectId(reviewId) })
+        res.send({
+            success: true,
+            message: 'Successfully got the reviews data',
+            data: reviews,
+        });
+    } catch (error) {
+        console.log(error.name, error.message)
+        res.send({
+            success: false,
+            error: error.message,
+        });
+    }
+})
+
+// Review Update
+app.patch("/api/online-basket/review/:reviewId", async (req, res) => {
+    try {
+        const reviewId = req.params.reviewId
+        const reviews = await Reviews.updateOne({ _id: ObjectId(reviewId) }, { $set: req.body })
+
+        if (reviews.matchedCount) {
+            res.send({
+                success: true,
+                message: "Successfully updated the review",
+            });
+        } else {
+            res.send({
+                success: false,
+                error: "Couldn't update  the review",
+            });
+        }
+    } catch (error) {
+        res.send({
+            success: false,
+            error: error.message,
+        });
+    }
+})
+
+// Review Deleted
+app.delete('/api/online-basket/review/:reviewId', async (req, res) => {
+    try {
+        const reviewId = req.params.reviewId
+        const query = { _id: ObjectId(reviewId) }
+        const deleteReview = await Reviews.deleteOne(query)
+        if(reviews.deletedCount) {
+            res.send({
+                success: true,
+                message: 'Successfully deleted the review'
+            })
+        }
+    } catch (error) {
+        console.log(error.name, error.message)
+        res.send({
+            success: false,
+            error: error.message
+        }) 
     }
 })
 
