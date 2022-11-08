@@ -62,7 +62,7 @@ app.post('/api/online-basket/services', async (req, res) => {
 // Home Page Service Get Api
 app.get('/api/online-basket/services', async (req, res) => {
     try {
-        const cursor = Services.find({})
+        const cursor = Services.find({}).sort('date', -1)
         const services = await cursor.limit(3).toArray()
         res.send({
             success: true,
@@ -81,7 +81,7 @@ app.get('/api/online-basket/services', async (req, res) => {
 // Get All services
 app.get('/api/online-basket/all-services', async (req, res) => {
     try {
-        const cursor = Services.find({})
+        const cursor = Services.find({}).sort('date', -1)
         const services = await cursor.toArray()
         res.send({
             success: true,
@@ -150,7 +150,7 @@ app.get('/api/online-basket/all-review', async (req, res) => {
                 serviceId: req.query.serviceId
             }
         }
-        const cursor = Reviews.find(query)
+        const cursor = Reviews.find(query).sort('date', -1)
         const reviews = await cursor.toArray()
         res.send({
             success: true,
@@ -175,7 +175,7 @@ app.get('/api/online-basket/review', async (req, res) => {
                 userEmail: req.query.email
             }
         }
-        const cursor = Reviews.find(query)
+        const cursor = Reviews.find(query).sort('date', -1)
         const reviews = await cursor.toArray()
         res.send({
             success: true,
