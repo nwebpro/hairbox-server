@@ -1,5 +1,6 @@
 import express from 'express'
 import cors from 'cors'
+import jwt from 'jsonwebtoken'
 import * as dotenv from 'dotenv'
 dotenv.config()
 import { MongoClient, ObjectId, ServerApiVersion } from 'mongodb'
@@ -33,7 +34,47 @@ dbConnect()
 const Services = client.db('onlineBasketDb').collection('services')
 const Reviews = client.db('onlineBasketDb').collection('reviews')
 
-// All Api Create Below
+// Verify 2 step and 3rd step order display api JWT Token
+function verifyJWT(req, res, next) {
+    const authHeader = req.headers.authorization
+    if(!authHeader) {
+        return res.status(401).send({
+            success: false,
+            message: 'Unauthorized Access!'
+        })
+    }
+    const token = authHeader.split(' ')[1]
+    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, function(err, decoded) {
+        if(err) {
+            return res.status(403).send({
+                success: false,
+                message: 'Forbidden Access!'
+            })
+        }
+        req.decoded = decoded
+        next()
+    })
+
+}
+
+// JWT Token Api
+app.post('/api/online-basket/jwt', (req, res) => {
+    try {
+        const user = req.body
+        const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '1d' })
+        res.send({
+            success: true,
+            message: 'Successfully JWT Token Generate!',
+            data: token
+        })
+    } catch (error) {
+        console.log(error.name, error.message)
+        res.send({
+            success: false,
+            error: error.message
+        })
+    }
+})
 
 // Service Create Api
 app.post('/api/online-basket/services', async (req, res) => {
@@ -118,7 +159,7 @@ app.get('/api/online-basket/service/:serviceId', async (req, res) => {
 })
 
 // All Review Api Below
-app.post('/api/online-basket/reviews', async (req, res) => {
+app.post('/api/online-basket/reviews', verifyJWT, async (req, res) => {
     try {
         const reviews = await Reviews.insertOne(req.body)
         if(reviews.insertedId) {
@@ -167,8 +208,17 @@ app.get('/api/online-basket/all-review', async (req, res) => {
 })
 
 // Review Display with user email
-app.get('/api/online-basket/review', async (req, res) => {
+app.get('/api/online-basket/review', verifyJWT, async (req, res) => {
     try {
+        // Verify 3rd step JWT Token
+        const decoded = req.decoded
+        if(decoded.email !== req.query.email) {
+            res.status(403).send({
+                success: false,
+                message: 'Forbidden Access!'
+            })
+        }
+
         let query = {}
         if(req.query.email){
             query = {
@@ -211,7 +261,7 @@ app.get("/api/online-basket/review/:reviewId", async (req, res) => {
 })
 
 // Review Update
-app.patch("/api/online-basket/review/:reviewId", async (req, res) => {
+app.patch("/api/online-basket/review/:reviewId", verifyJWT, async (req, res) => {
     try {
         const reviewId = req.params.reviewId
         const reviews = await Reviews.updateOne({ _id: ObjectId(reviewId) }, { $set: req.body })
@@ -236,7 +286,7 @@ app.patch("/api/online-basket/review/:reviewId", async (req, res) => {
 })
 
 // Review Deleted
-app.delete('/api/online-basket/review/:reviewId', async (req, res) => {
+app.delete('/api/online-basket/review/:reviewId', verifyJWT, async (req, res) => {
     try {
         const reviewId = req.params.reviewId
         const query = { _id: ObjectId(reviewId) }
