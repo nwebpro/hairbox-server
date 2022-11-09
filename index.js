@@ -28,7 +28,7 @@ async function dbConnect() {
         console.log(error.name, error.message)
     }
 }
-dbConnect()
+dbConnect().catch(error => console.log(error.message))
 
 // Database Collection
 const Services = client.db('onlineBasketDb').collection('services')
@@ -61,7 +61,7 @@ function verifyJWT(req, res, next) {
 app.post('/api/online-basket/jwt', (req, res) => {
     try {
         const user = req.body
-        const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '1d' })
+        const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET)
         res.send({
             success: true,
             message: 'Successfully JWT Token Generate!',
@@ -159,7 +159,7 @@ app.get('/api/online-basket/service/:serviceId', async (req, res) => {
 })
 
 // All Review Api Below
-app.post('/api/online-basket/reviews', verifyJWT, async (req, res) => {
+app.post('/api/online-basket/reviews', async (req, res) => {
     try {
         const reviews = await Reviews.insertOne(req.body)
         if(reviews.insertedId) {
