@@ -13,8 +13,8 @@ app.use(cors())
 app.use(express.json())
 
 
-app.get('/api/online-basket', (req, res) => {
-    res.send('Online Basket Server Side Running')
+app.get('/api/hairbox', (req, res) => {
+    res.send('Hairbox Server Side Running')
 })
 
 // Mongodb Setup
@@ -58,7 +58,7 @@ function verifyJWT(req, res, next) {
 }
 
 // JWT Token Api
-app.post('/api/online-basket/jwt', (req, res) => {
+app.post('/api/hairbox/jwt', (req, res) => {
     try {
         const user = req.body
         const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET)
@@ -68,7 +68,6 @@ app.post('/api/online-basket/jwt', (req, res) => {
             data: token
         })
     } catch (error) {
-        console.log(error.name, error.message)
         res.send({
             success: false,
             error: error.message
@@ -77,7 +76,7 @@ app.post('/api/online-basket/jwt', (req, res) => {
 })
 
 // Service Create Api
-app.post('/api/online-basket/services', async (req, res) => {
+app.post('/api/hairbox/services', async (req, res) => {
     try {
         const services = await Services.insertOne(req.body)
         if(services.insertedId) {
@@ -92,7 +91,6 @@ app.post('/api/online-basket/services', async (req, res) => {
             })
         }
     } catch (error) {
-        console.log(error.name, error.message)
         res.send({
             success: false,
             error: error.message
@@ -101,7 +99,7 @@ app.post('/api/online-basket/services', async (req, res) => {
 })
 
 // Home Page Service Get Api
-app.get('/api/online-basket/services', async (req, res) => {
+app.get('/api/hairbox/services', async (req, res) => {
     try {
         const cursor = Services.find({}).sort('date', -1)
         const services = await cursor.limit(3).toArray()
@@ -111,7 +109,6 @@ app.get('/api/online-basket/services', async (req, res) => {
             data: services
         })
     } catch (error) {
-        console.log(error.name, error.message)
         res.send({
             success: false,
             error: error.message
@@ -120,7 +117,7 @@ app.get('/api/online-basket/services', async (req, res) => {
 })
 
 // Get All services
-app.get('/api/online-basket/all-services', async (req, res) => {
+app.get('/api/hairbox/all-services', async (req, res) => {
     try {
         const cursor = Services.find({}).sort('date', -1)
         const services = await cursor.toArray()
@@ -130,7 +127,6 @@ app.get('/api/online-basket/all-services', async (req, res) => {
             data: services
         })
     } catch (error) {
-        console.log(error.name, error.message)
         res.send({
             success: false,
             error: error.message
@@ -139,7 +135,7 @@ app.get('/api/online-basket/all-services', async (req, res) => {
 })
 
 // Single Service Get Api with Id
-app.get('/api/online-basket/service/:serviceId', async (req, res) => {
+app.get('/api/hairbox/service/:serviceId', async (req, res) => {
     try {
         const serviceId = req.params.serviceId
         const query = { _id: ObjectId(serviceId) }
@@ -150,7 +146,6 @@ app.get('/api/online-basket/service/:serviceId', async (req, res) => {
             data: services
         })
     } catch (error) {
-        console.log(error.name, error.message)
         res.send({
             success: false,
             error: error.message
@@ -159,7 +154,7 @@ app.get('/api/online-basket/service/:serviceId', async (req, res) => {
 })
 
 // All Review Api Below
-app.post('/api/online-basket/reviews', async (req, res) => {
+app.post('/api/hairbox/reviews', async (req, res) => {
     try {
         const reviews = await Reviews.insertOne(req.body)
         if(reviews.insertedId) {
@@ -174,7 +169,6 @@ app.post('/api/online-basket/reviews', async (req, res) => {
             })
         }
     } catch (error) {
-        console.log(error.name, error.message)
         res.send({
             success: false,
             error: error.message
@@ -183,7 +177,7 @@ app.post('/api/online-basket/reviews', async (req, res) => {
 })
 
 // Review Display with service id
-app.get('/api/online-basket/all-review', async (req, res) => {
+app.get('/api/hairbox/all-review', async (req, res) => {
     try {
         let query = {}
         if(req.query.serviceId){
@@ -199,7 +193,6 @@ app.get('/api/online-basket/all-review', async (req, res) => {
             data: reviews
         })
     } catch (error) {
-        console.log(error.name, error.message)
         res.send({
             success: false,
             error: error.message
@@ -208,7 +201,7 @@ app.get('/api/online-basket/all-review', async (req, res) => {
 })
 
 // Review Display with user email
-app.get('/api/online-basket/review', verifyJWT, async (req, res) => {
+app.get('/api/hairbox/review', verifyJWT, async (req, res) => {
     try {
         // Verify 3rd step JWT Token
         const decoded = req.decoded
@@ -227,13 +220,8 @@ app.get('/api/online-basket/review', verifyJWT, async (req, res) => {
         }
         const cursor = Reviews.find(query).sort('date', -1)
         const reviews = await cursor.toArray()
-        res.send({
-            success: true,
-            message: 'Successfully got the all reviews data',
-            data: reviews
-        })
+        res.send(reviews)
     } catch (error) {
-        console.log(error.name, error.message)
         res.send({
             success: false,
             error: error.message
@@ -242,7 +230,7 @@ app.get('/api/online-basket/review', verifyJWT, async (req, res) => {
 })
 
 // Single Review with id
-app.get("/api/online-basket/review/:reviewId", async (req, res) => {
+app.get("/api/hairbox/review/:reviewId", async (req, res) => {
     try {
         const reviewId = req.params.reviewId
         const reviews = await Reviews.findOne({ _id: ObjectId(reviewId) })
@@ -252,7 +240,6 @@ app.get("/api/online-basket/review/:reviewId", async (req, res) => {
             data: reviews,
         });
     } catch (error) {
-        console.log(error.name, error.message)
         res.send({
             success: false,
             error: error.message,
@@ -261,7 +248,7 @@ app.get("/api/online-basket/review/:reviewId", async (req, res) => {
 })
 
 // Review Update
-app.patch("/api/online-basket/review/:reviewId", verifyJWT, async (req, res) => {
+app.patch("/api/hairbox/review/:reviewId", verifyJWT, async (req, res) => {
     try {
         const reviewId = req.params.reviewId
         const reviews = await Reviews.updateOne({ _id: ObjectId(reviewId) }, { $set: req.body })
@@ -286,19 +273,17 @@ app.patch("/api/online-basket/review/:reviewId", verifyJWT, async (req, res) => 
 })
 
 // Review Deleted
-app.delete('/api/online-basket/review/:reviewId', verifyJWT, async (req, res) => {
+app.delete('/api/hairbox/review/:reviewId', verifyJWT, async (req, res) => {
     try {
         const reviewId = req.params.reviewId
-        const query = { _id: ObjectId(reviewId) }
-        const deleteReview = await Reviews.deleteOne(query)
-        if(reviews.deletedCount) {
+        const deleteReview = await Reviews.deleteOne({ _id: ObjectId(reviewId) })
+        if(deleteReview.deletedCount) {
             res.send({
                 success: true,
                 message: 'Successfully deleted the review'
             })
         }
     } catch (error) {
-        console.log(error.name, error.message)
         res.send({
             success: false,
             error: error.message
@@ -308,5 +293,5 @@ app.delete('/api/online-basket/review/:reviewId', verifyJWT, async (req, res) =>
 
 
 app.listen(port, () => {
-    console.log(`Online Basket Server Running on Port ${port}`)
+    console.log(`Hairbox Server Running on Port ${port}`)
 })
