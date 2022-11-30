@@ -7,7 +7,7 @@
 
 ## [API Live Demo](https://haircat-salon.vercel.app/api/hairbox).
 
-## [Hairbox Client Side](https://github.com/Porgramming-Hero-web-course/b6a11-service-review-client-side-nwebpro).
+## [Hairbox Client Side](https://github.com/nwebpro/hairbox-client).
 
 
 # Technologies Used:⚛️
